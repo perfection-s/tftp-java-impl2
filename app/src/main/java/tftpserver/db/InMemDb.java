@@ -19,7 +19,7 @@ import java.util.concurrent.locks.Lock;
 public class InMemDb implements Db {
 
     // TODO (For Vidit): Can you change this to use a sync. map?
-    private Map<String, List<String>> inMemDb = null;
+    private Map<String, List<byte[]>> inMemDb = null;
     private static InMemDb db;
     private Lock lock;
 
@@ -33,11 +33,11 @@ public class InMemDb implements Db {
     }
 
     private InMemDb() {
-        inMemDb = new HashMap<String, List<String>>();
+        inMemDb = new HashMap<String, List<byte[]>>();
     }
 
     @Override
-    public void saveFile(String filename, List<String> content) {
+    public void saveFile(String filename, List<byte[]> content) {
         lock.lock();
         try {
             inMemDb.put(filename, content);
@@ -47,7 +47,7 @@ public class InMemDb implements Db {
     }
 
     @Override
-    public List<String> getFile(String filename) {
+    public List<byte[]> getFile(String filename) {
         lock.lock();
         try {
             return inMemDb.get(filename);

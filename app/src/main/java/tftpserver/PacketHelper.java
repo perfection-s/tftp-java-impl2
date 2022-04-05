@@ -25,7 +25,7 @@ public class PacketHelper {
      */
     final static short ACK_OP = 4;
 
-    static void sendAck(short blockNumber, DatagramSocket sock, SocketAddress addr) throws IOException {
+    public static void sendAck(short blockNumber, DatagramSocket sock, SocketAddress addr) throws IOException {
         ByteBuffer ackByteBuffer = ByteBuffer.allocate(4);
         ackByteBuffer.putShort(ACK_OP);
         ackByteBuffer.putShort(blockNumber);
@@ -33,6 +33,7 @@ public class PacketHelper {
     }
 
     public static String getFileName(DatagramPacket reqPkt) {
-        return null;
+        // FIXME parse the packet and get the filename
+        return "somefile";
     }
 }

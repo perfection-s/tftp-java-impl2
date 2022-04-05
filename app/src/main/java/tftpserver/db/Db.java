@@ -20,8 +20,8 @@ public interface Db {
      *                  ...
      *                 [<512] String (Block `n`)
      */
-    void saveFile(String filename, List<String> content);
+    void saveFile(String filename, List<byte[]> content);
 
 
-    List<String> getFile(String filename);
+    List<byte[]> getFile(String filename);
 }
