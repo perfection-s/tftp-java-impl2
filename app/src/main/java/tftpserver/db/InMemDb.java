@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * InMemDb holds filenames and the file contents in a map that is thread safe.

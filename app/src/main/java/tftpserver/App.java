@@ -29,10 +29,6 @@ public class App {
                 byte[] requestPacketBuffer = new byte[bufLength];
 
                 DatagramPacket requestPacket = new DatagramPacket(requestPacketBuffer, bufLength);
-
-                // Wait to get a request
-                // TODO Lets assume it's always a SET request for now.
-                // TODO (For Vidit) Implement strategy to check if req. is SET or GET
                 tftpSocket.receive(requestPacket);
                 RequestHandler.verifyAndHandle(requestPacket);
 
@@ -41,7 +37,9 @@ public class App {
                 System.exit(-1);
             } catch (InvalidRequestPacketException e) {
                 e.printStackTrace();
-                // FIXME This is again a strange case. Must send an ERR packet to the client
+                // FIXME This is again a strange case. This must never happen unless
+                //  a client has been erroneously programmed.
+                //  Must send an ERR packet to the client
             }
         }
     }
