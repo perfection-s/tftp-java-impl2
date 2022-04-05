@@ -1,5 +1,7 @@
 package tftpserver.handlers;
 
+import lombok.extern.java.Log;
+import tftpserver.InvalidRequestPacketException;
 import tftpserver.PacketHelper;
 
 import java.net.DatagramPacket;
@@ -15,25 +17,41 @@ import java.util.Random;
  * - Filename (For Set & Get)
  * - Run the thread
  */
-public class RequestHandler implements Runnable {
-    private DatagramPacket reqPkt = null;
+@Log
+public class RequestHandler {
 
-    public RequestHandler(DatagramPacket requestPacket) {
-        this.reqPkt = requestPacket;
-    }
+    /**
+     * Validation Rules
+     *   - Op Code must be one of 01/02
+     * @throws InvalidRequestPacketException If Packet is not a REQ type packet
+     */
+    public static void verifyAndHandle(DatagramPacket reqPkt) throws InvalidRequestPacketException{
+        final short RRQ = 1;
+        final short WRQ = 2;
 
-    @Override
-    public void run() {
+        short opCode = PacketHelper.getOpCode(reqPkt);
+        if (opCode != RRQ && opCode != WRQ) {
+            throw new InvalidRequestPacketException("Invalid Request Packet. Illegal OpCode: " + opCode);
+        }
+
         // 1. Get a new port for the Request
-        int transferPort = new Random().ints(2000, 20000)
+        int tid = new Random().ints(2000, 20000)
                 .findFirst()
                 .orElse(15000);
 
         try {
+
             // 2. Setup the SetHandler
-            Runnable handler = new SetHandler(transferPort,
-                    reqPkt.getSocketAddress(),
-                    PacketHelper.getFileName(reqPkt));
+            DataTransferHandler handler;
+
+            if (opCode == RRQ) {
+                // TODO Vidit to implement his stuff here.
+                throw new UnsupportedOperationException("Read Not Implemented Yet..");
+            } else {
+                handler = new PutHandler(tid,
+                        reqPkt.getSocketAddress(),
+                        PacketHelper.getFileName(reqPkt));
+            }
 
             // 3. Run the handler
             new Thread(handler).start();

@@ -1,5 +1,6 @@
 package tftpserver.db;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -23,5 +24,11 @@ public interface Db {
     void saveFile(String filename, List<byte[]> content);
 
 
-    List<byte[]> getFile(String filename);
+    /**
+     * Given a filename, return the contents of it as a List<byte[]>
+     * @param filename name of the file whose contents must be fetched
+     * @return Contents of the file formatted as List<byte[]>
+     * @throws FileNotFoundException If requested file isn't found
+     */
+    List<byte[]> getFile(String filename) throws FileNotFoundException;
 }

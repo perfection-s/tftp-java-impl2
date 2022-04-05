@@ -33,7 +33,19 @@ public class PacketHelper {
     }
 
     public static String getFileName(DatagramPacket reqPkt) {
-        // FIXME parse the packet and get the filename
-        return "somefile";
+        StringBuilder sb = new StringBuilder();
+        byte[] data = reqPkt.getData();
+        for (int offset = 2; data[offset] != 0 && offset < reqPkt.getLength(); offset++) {
+            sb.append((char)data[offset]);
+        }
+        return sb.toString();
+    }
+
+    public static Short getDataPacketBlockNumber(DatagramPacket datagramPacket) {
+        return -1;
+    }
+
+    public static short getOpCode(DatagramPacket pkt) {
+        return ByteBuffer.wrap(pkt.getData()).getShort(0);
     }
 }

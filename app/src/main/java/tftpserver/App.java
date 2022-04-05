@@ -3,40 +3,46 @@
  */
 package tftpserver;
 
-import tftpserver.db.Db;
+import lombok.extern.java.Log;
 import tftpserver.db.InMemDb;
-import tftpserver.db.MongoDb;
 import tftpserver.handlers.RequestHandler;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.logging.Level;
 
+@Log
 public class App {
 
     public static void main(String[] args) {
         // Instantiate the DB
         InMemDb.getDb();
+        log.log(Level.FINER, "Created the InMemDb");
 
-        try (DatagramSocket tftpSocket = new DatagramSocket(69)) {
+        while (true) {
+            try (DatagramSocket tftpSocket = new DatagramSocket(69)) {
 
-            // Lets create a sufficiently big buffer because the
-            // request packets have filenames which can be really big
-            int bufLength = 1024;
-            byte[] requestPacketBuffer = new byte[bufLength];
+                // Lets create a sufficiently big buffer because the
+                // request packets have filenames which can be really big
+                int bufLength = 1024;
+                byte[] requestPacketBuffer = new byte[bufLength];
 
-            DatagramPacket requestPacket = new DatagramPacket(requestPacketBuffer, bufLength);
+                DatagramPacket requestPacket = new DatagramPacket(requestPacketBuffer, bufLength);
 
-            // Wait to get a request
-            // TODO Lets assume it's always a SET request for now.
-            // TODO (For Vidit) Implement strategy to check if req. is SET or GET
-            tftpSocket.receive(requestPacket);
-            Runnable requestHandler = new RequestHandler(requestPacket);
-            requestHandler.run();
+                // Wait to get a request
+                // TODO Lets assume it's always a SET request for now.
+                // TODO (For Vidit) Implement strategy to check if req. is SET or GET
+                tftpSocket.receive(requestPacket);
+                RequestHandler.verifyAndHandle(requestPacket);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            } catch (InvalidRequestPacketException e) {
+                e.printStackTrace();
+                // FIXME This is again a strange case. Must send an ERR packet to the client
+            }
         }
     }
 }

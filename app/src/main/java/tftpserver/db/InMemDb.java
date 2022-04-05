@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * InMemDb holds filenames and the file contents in a map that is thread safe.
@@ -18,10 +20,10 @@ import java.util.concurrent.locks.Lock;
 
 public class InMemDb implements Db {
 
-    // TODO (For Vidit): Can you change this to use a sync. map?
+    // TODO (For Vidit): Can you change this to use a ConcurrentHashMap?
     private Map<String, List<byte[]>> inMemDb = null;
     private static InMemDb db;
-    private Lock lock;
+    private final Lock lock;
 
     public static InMemDb getDb() {
         if (db == null) {
@@ -34,6 +36,7 @@ public class InMemDb implements Db {
 
     private InMemDb() {
         inMemDb = new HashMap<String, List<byte[]>>();
+        lock = new ReentrantLock();
     }
 
     @Override
