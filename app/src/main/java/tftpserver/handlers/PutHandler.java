@@ -29,7 +29,7 @@ public class PutHandler implements DataTransferHandler {
 
     @Override
     public void run() {
-        short blockNumber = 0;
+        Short blockNumber = 0;
         int dataSize = 0;
 
         /*
@@ -47,7 +47,7 @@ public class PutHandler implements DataTransferHandler {
         //         to send the data packets to. Also indicates that the server at
         //         this point is ready to accept data packets.
         try {
-            PacketHelper.sendAck(blockNumber++, sock, clientAddress);
+            PacketHelper.sendAck(blockNumber, sock, clientAddress);
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -60,6 +60,18 @@ public class PutHandler implements DataTransferHandler {
                 DatagramPacket dataPkt = new DatagramPacket(dataPktBuffer, bufLength);
 
                 sock.receive(dataPkt);
+
+                // Ensure it's a data packet only
+                if (!PacketHelper.isDataPacket(dataPkt)) {
+                    // This is a strange case. Ignore this packet for now..
+                    log.log(Level.WARNING, "Ignoring unexpected Packet Type with OpCode: " +
+                            PacketHelper.getOpCode(dataPkt));
+                    continue;
+                }
+
+                // Whats the block number of the packet?
+                blockNumber = PacketHelper.getBlockNumber(dataPkt);
+
                 byte []data = dataPkt.getData();
                 ByteBuffer dataBytes = ByteBuffer.allocate(512);
 
@@ -72,13 +84,7 @@ public class PutHandler implements DataTransferHandler {
                 dataSize = dataBytes.position();
                 fileContents.add(Arrays.copyOfRange(dataBytes.array(), 0, dataSize));
 
-                /*
-                 * TODO
-                 *  We're incrementing blocknumber linearly here which is incorrect.
-                 *  We must parse a short from the packet at offset 2 to get the
-                 *  block number.
-                 */
-                PacketHelper.sendAck(blockNumber++, sock, clientAddress);
+                PacketHelper.sendAck(blockNumber, sock, clientAddress);
             } while (dataSize >= 512);
         } catch (IOException e) {
             e.printStackTrace();

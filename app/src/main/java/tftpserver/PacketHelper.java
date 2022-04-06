@@ -23,9 +23,10 @@ public class PacketHelper {
     /**
      * Define Operation identifiers as constants
      */
-    final static short ACK_OP = 4;
+    final static Short DATA_OP = 3;
+    final static Short ACK_OP = 4;
 
-    public static void sendAck(short blockNumber, DatagramSocket sock, SocketAddress addr) throws IOException {
+    public static void sendAck(Short blockNumber, DatagramSocket sock, SocketAddress addr) throws IOException {
         ByteBuffer ackByteBuffer = ByteBuffer.allocate(4);
         ackByteBuffer.putShort(ACK_OP);
         ackByteBuffer.putShort(blockNumber);
@@ -45,7 +46,30 @@ public class PacketHelper {
         return -1;
     }
 
-    public static short getOpCode(DatagramPacket pkt) {
+    /**
+     * Given a Datagram Packet, the method extracts the bytes at the
+     * first two locations, parses a Short value from them and returns
+     * them as the OpCode.
+     * @param pkt Input DatagramPacket from which the OpCode must be extracted
+     * @return OpCode
+     */
+    public static Short getOpCode(DatagramPacket pkt) {
         return ByteBuffer.wrap(pkt.getData()).getShort(0);
+    }
+
+    /**
+     * Given a Datagram Packet, the method extracts the bytes at the
+     * second and the third locations in the data and parses a Short from
+     * it.
+     *
+     * @param pkt Input DatagramPacket from which the block number must be extracted
+     * @return Block Number
+     */
+    public static Short getBlockNumber(DatagramPacket pkt) {
+        return ByteBuffer.wrap(pkt.getData()).getShort(2);
+    }
+
+    public static Boolean isDataPacket(DatagramPacket pkt) {
+        return PacketHelper.getOpCode(pkt).equals(DATA_OP);
     }
 }
