@@ -2,6 +2,7 @@ package tftpserver.handlers;
 
 import lombok.extern.java.Log;
 import tftpserver.PacketHelper;
+import tftpserver.core.TFTPDataChunk;
 import tftpserver.db.InMemDb;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class PutHandler implements DataTransferHandler {
 
         // Handle to hold the byte arrays that define the contents
         // of the file.
-        List<byte[]> fileContents = new ArrayList<>();
+        List<TFTPDataChunk> fileContents = new ArrayList<>();
 
         // Step 1: Send an ACK Packet to the client to let it know what port to use
         //         to send the data packets to. Also indicates that the server at
@@ -82,7 +83,10 @@ public class PutHandler implements DataTransferHandler {
                 }
 
                 dataSize = dataBytes.position();
-                fileContents.add(Arrays.copyOfRange(dataBytes.array(), 0, dataSize));
+                fileContents.add(new TFTPDataChunk(
+                        blockNumber,
+                        Arrays.copyOfRange(dataBytes.array(), 0, dataSize)
+                ));
 
                 PacketHelper.sendAck(blockNumber, sock, clientAddress);
             } while (dataSize >= 512);
