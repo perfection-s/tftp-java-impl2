@@ -1,5 +1,7 @@
 package tftpserver.db;
 
+import tftpserver.core.TFTPDataChunk;
+
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -21,8 +23,7 @@ public interface Db {
      *                  ...
      *                 [<512] String (Block `n`)
      */
-    void saveFile(String filename, List<byte[]> content);
-
+    void saveFile(String filename, List<TFTPDataChunk> content);
 
     /**
      * Given a filename, return the contents of it as a List<byte[]>

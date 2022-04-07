@@ -1,8 +1,8 @@
 package tftpserver.db;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import tftpserver.core.TFTPDataChunk;
+
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class InMemDb implements Db {
 
     // TODO (For Vidit): Can you change this to use a ConcurrentHashMap?
-    private Map<String, List<byte[]>> inMemDb = null;
+    private final Map<String, PriorityQueue<TFTPDataChunk>> inMemDb;
     private static InMemDb db;
     private final Lock lock;
 
@@ -34,15 +34,18 @@ public class InMemDb implements Db {
     }
 
     private InMemDb() {
-        inMemDb = new HashMap<String, List<byte[]>>();
+        inMemDb = new HashMap<>();
         lock = new ReentrantLock();
     }
 
     @Override
-    public void saveFile(String filename, List<byte[]> content) {
+    public void saveFile(String filename, List<TFTPDataChunk> content) {
+        PriorityQueue<TFTPDataChunk> pq = new PriorityQueue<>();
+        pq.addAll(content);
+
         lock.lock();
         try {
-            inMemDb.put(filename, content);
+            inMemDb.put(filename, pq);
         } finally {
             lock.unlock();
         }
@@ -50,9 +53,15 @@ public class InMemDb implements Db {
 
     @Override
     public List<byte[]> getFile(String filename) {
+        List<byte[]> fileContents = new ArrayList<>();
         lock.lock();
         try {
-            return inMemDb.get(filename);
+            PriorityQueue<TFTPDataChunk> pq = inMemDb.get(filename);
+
+            while (!pq.isEmpty()) {
+                fileContents.add(pq.poll().getData());
+            }
+            return fileContents;
         } finally {
             lock.unlock();
         }
