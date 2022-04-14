@@ -25,11 +25,19 @@ public class PacketHelper {
      */
     final static Short DATA_OP = 3;
     final static Short ACK_OP = 4;
+    final static Short ERR_OP=5;
 
     public static void sendAck(Short blockNumber, DatagramSocket sock, SocketAddress addr) throws IOException {
         ByteBuffer ackByteBuffer = ByteBuffer.allocate(4);
         ackByteBuffer.putShort(ACK_OP);
         ackByteBuffer.putShort(blockNumber);
+        sock.send(new DatagramPacket(ackByteBuffer.array(), ACK_PACKET_LEN, addr));
+    }
+    public static void sendErr(Short ErrorCode, DatagramSocket sock, SocketAddress addr) throws IOException {
+        ByteBuffer ackByteBuffer = ByteBuffer.allocate(5);
+        ackByteBuffer.putShort(ERR_OP);
+        ackByteBuffer.putShort(ErrorCode);
+        //ackByteBuffer.put(src);
         sock.send(new DatagramPacket(ackByteBuffer.array(), ACK_PACKET_LEN, addr));
     }
 
