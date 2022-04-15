@@ -3,6 +3,9 @@
 /build/
 .vscode
 .idea
+.metadata
+ere
+
 
 app/build
 app/bin

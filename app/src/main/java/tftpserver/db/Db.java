@@ -32,4 +32,5 @@ public interface Db {
      * @throws FileNotFoundException If requested file isn't found
      */
     List<byte[]> getFile(String filename) throws FileNotFoundException;
+    boolean isPresent(String filename); 
 }
