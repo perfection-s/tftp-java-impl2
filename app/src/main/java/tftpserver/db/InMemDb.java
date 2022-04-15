@@ -66,4 +66,10 @@ public class InMemDb implements Db {
             lock.unlock();
         }
     }
+    @Override
+    public boolean isPresent(String filename) {
+    	if(inMemDb.containsKey(filename)) {return true;}
+    	return false;
+    }
+    
 }
